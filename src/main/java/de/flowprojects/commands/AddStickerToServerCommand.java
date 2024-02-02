@@ -11,6 +11,6 @@ public class AddStickerToServerCommand implements MessageInteractionCommand {
 
     @Override
     public Mono<Void> handle(MessageInteractionEvent event) {
-        return event.reply("Yippe " + getName());
+        return event.reply("Yippee " + getName());
     }
 }

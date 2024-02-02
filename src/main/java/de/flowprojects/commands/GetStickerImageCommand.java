@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 public class GetStickerImageCommand implements MessageInteractionCommand {
     @Override
     public String getName() {
-        return "Get sticker image";
+        return "Get Sticker Image";
     }
 
     @Override
