@@ -1,9 +1,9 @@
 package de.flowprojects.listeners;
 
+import de.flowprojects.commands.AddStickerToServerCommand;
 import de.flowprojects.commands.MessageInteractionCommand;
-import de.flowprojects.commands.SwipeCommand;
+import de.flowprojects.commands.GetStickerImageCommand;
 import discord4j.core.event.domain.interaction.MessageInteractionEvent;
-import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,7 +14,8 @@ public class MessageInteractionEventListener {
     private final static List<MessageInteractionCommand> commands = new ArrayList<>();
 
     static {
-        commands.add(new SwipeCommand());
+        commands.add(new GetStickerImageCommand());
+        commands.add(new AddStickerToServerCommand());
     }
 
     public static Mono<Void> handle(MessageInteractionEvent event) {

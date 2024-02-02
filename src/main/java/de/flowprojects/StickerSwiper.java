@@ -29,12 +29,16 @@ public class StickerSwiper
         GatewayDiscordClient client = DiscordClientBuilder.create(discordApiToken).build().login().block();
 
         //Build Swipe command request to be used for command registration
-        ApplicationCommandRequest swipeCmdRequest = getSwipeCommandRequest();
+        ApplicationCommandRequest stickerImageCommandRequest = getGetStickerImageCommandRequest();
+        ApplicationCommandRequest addStickerToServerCommandRequest = getAddStickerToServerCommandRequest();
 
         //GUILD command registration for swipe command
         client.getRestClient().getApplicationService()
-                .createGuildApplicationCommand(applicationId, guildId, swipeCmdRequest)
+                .createGuildApplicationCommand(applicationId, guildId, stickerImageCommandRequest)
                 .subscribe();
+
+        client.getRestClient().getApplicationService()
+                .createGuildApplicationCommand(applicationId, guildId, addStickerToServerCommandRequest);
 
         /*
         //GLOBAL command registration for swipe command
@@ -61,9 +65,16 @@ public class StickerSwiper
     }
 
 
-    private static ApplicationCommandRequest getSwipeCommandRequest() {
+    private static ApplicationCommandRequest getGetStickerImageCommandRequest() {
         return ApplicationCommandRequest.builder()
-                .name("swipe")
+                .name("Get sticker image")
+                .type(3)
+                .build();
+    }
+
+    private static ApplicationCommandRequest getAddStickerToServerCommandRequest() {
+        return ApplicationCommandRequest.builder()
+                .name("Add sticker to this server")
                 .type(3)
                 .build();
     }
@@ -73,7 +84,8 @@ public class StickerSwiper
                 Intent.GUILD_MESSAGES,
                 Intent.GUILD_MESSAGE_REACTIONS,
                 Intent.GUILD_MESSAGE_TYPING,
-                Intent.MESSAGE_CONTENT
+                Intent.MESSAGE_CONTENT,
+                Intent.GUILD_EMOJIS_AND_STICKERS
         );
     }
 }
