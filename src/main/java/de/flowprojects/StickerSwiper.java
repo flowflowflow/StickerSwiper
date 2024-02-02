@@ -105,20 +105,27 @@ public class StickerSwiper
         log.info(StickerSwiper.class + "deleteAllGuildCommands deleted the following commands: " + discordCommands);
     }
 
-    //TODO
-    private static void deleteGlobalCommands(long applicationId, long guildId, GatewayDiscordClient gateway) {
+    private static void deleteGlobalCommands(long applicationId, GatewayDiscordClient gateway) {
         Map<String, ApplicationCommandData> discordCommands = gateway.getRestClient()
                 .getApplicationService()
                 .getGlobalApplicationCommands(applicationId)
                 .collectMap(ApplicationCommandData::name)
                 .block();
 
-        discordCommands.entrySet().removeIf(entry -> swiperBotCommands.contains(entry.getKey()));
+        discordCommands.entrySet().removeIf(entry -> !entry.getValue().equals(swiperBotCommands));
+
+        for(Map.Entry<String, ApplicationCommandData> entry : discordCommands.entrySet()) {
+            long commandId = entry.getValue().id().asLong();
+            gateway.getRestClient()
+                    .getApplicationService()
+                    .deleteGlobalApplicationCommand(applicationId, commandId);
+        }
 
         log.info(StickerSwiper.class + "deleteAllGuildCommands deleted the following commands: " + discordCommands);
     }
 
 
+    //TODO: add modify commands methods
 
 
     private static ApplicationCommandRequest getGetStickerImageCommandRequest() {
