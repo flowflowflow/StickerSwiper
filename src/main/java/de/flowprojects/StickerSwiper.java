@@ -4,8 +4,10 @@ import de.flowprojects.listeners.MessageInteractionEventListener;
 import de.flowprojects.util.Constants;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.interaction.MessageInteractionEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
 import discord4j.core.object.presence.Status;
@@ -15,6 +17,7 @@ import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -67,16 +70,17 @@ public class StickerSwiper
         */
 
 
-        //Update online status and activity
-        /*ÜÜ
-        gateway.updatePresence(
-                ClientPresence.of(Status.ONLINE, ClientActivity.playing("Swiping Stickers >:3c"))
-        ).subscribe();
-        */
-
-
         //Handle various events
         gateway.on(MessageInteractionEvent.class, MessageInteractionEventListener::handle).subscribe();
+
+        //Testing
+        gateway.on(MessageCreateEvent.class, event -> {
+            if(event.getMessage().getContent().equals("?deleteguildcommands")) {
+                deleteGuildCommands(applicationId, guildId, gateway);
+            }
+
+            return Mono.empty();
+        }).subscribe();
 
         gateway.on(ReadyEvent.class, event -> {
             log.info("Logged in with {}", gateway.getSelf().block().getUsername());
