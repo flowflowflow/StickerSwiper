@@ -16,7 +16,10 @@ import java.util.Map;
 @Slf4j
 public class CommandManager {
 
-    List<String> swiperBotCommands;
+    final long appId = Long.parseLong(Constants.APP_ID.value);
+    final long guildId = Long.parseLong(Constants.GUILD_ID.value);
+
+    final List<String> swiperBotCommands;
     String getStickerImgCmdName;
     String addStickerCmdName;
 
@@ -26,6 +29,28 @@ public class CommandManager {
         addStickerCmdName = "Add Sticker to Server";
 
         swiperBotCommands = new ArrayList<>(Arrays.asList(getStickerImgCmdName, addStickerCmdName));
+    }
+
+    public void registerGuildCommand(GatewayDiscordClient gateway, List<ApplicationCommandRequest> commandRequests) {
+        for(ApplicationCommandRequest request : commandRequests) {
+            gateway.getRestClient()
+                    .getApplicationService()
+                    .createGuildApplicationCommand(appId, guildId, request)
+                    .subscribe();
+
+            log.info(this.getClass().getSimpleName() + "Registered command: " + request.name());
+        }
+    }
+
+    public void registerGlobalCommand(GatewayDiscordClient gateway, List<ApplicationCommandRequest> commandRequests) {
+        for(ApplicationCommandRequest request : commandRequests) {
+            gateway.getRestClient()
+                    .getApplicationService()
+                    .createGlobalApplicationCommand(appId, request)
+                    .subscribe();
+
+            log.info(this.getClass().getSimpleName() + "Registered command: " + request.name());
+        }
     }
 
     public ApplicationCommandRequest getAddStickerToServerCommandRequest() {
@@ -42,10 +67,10 @@ public class CommandManager {
                 .build();
     }
 
-    public void deleteGuildCommands(long applicationId, long guildId, GatewayDiscordClient gateway) {
+    public void deleteGuildCommands(GatewayDiscordClient gateway) {
         Map<String, ApplicationCommandData> discordCommands = gateway.getRestClient()
                 .getApplicationService()
-                .getGuildApplicationCommands(applicationId, guildId)
+                .getGuildApplicationCommands(appId, guildId)
                 .collectMap(ApplicationCommandData::name)
                 .block();
 
@@ -56,28 +81,29 @@ public class CommandManager {
             long commandId = entry.getValue().id().asLong();
             gateway.getRestClient()
                     .getApplicationService()
-                    .deleteGuildApplicationCommand(applicationId, guildId, commandId);
+                    .deleteGuildApplicationCommand(appId, guildId, commandId);
 
             log.info(StickerSwiper.class.getSimpleName() + ": deleteAllGuildCommands deleted the following commands: " + entry.getKey());
         }
     }
 
-    public void deleteGlobalCommands(long applicationId, GatewayDiscordClient gateway) {
+    public void deleteGlobalCommands(GatewayDiscordClient gateway) {
         Map<String, ApplicationCommandData> discordCommands = gateway.getRestClient()
                 .getApplicationService()
-                .getGlobalApplicationCommands(applicationId)
+                .getGlobalApplicationCommands(appId)
                 .collectMap(ApplicationCommandData::name)
                 .block();
 
+        //Clean out map
         //discordCommands.entrySet().removeIf(entry -> !entry.getValue().equals(swiperBotCommands));
 
         for(Map.Entry<String, ApplicationCommandData> entry : discordCommands.entrySet()) {
             long commandId = entry.getValue().id().asLong();
             gateway.getRestClient()
                     .getApplicationService()
-                    .deleteGlobalApplicationCommand(applicationId, commandId);
+                    .deleteGlobalApplicationCommand(appId, commandId);
 
-            log.info(StickerSwiper.class + "deleteAllGlobalCommands deleted the following commands: " + entry.getKey());
+            log.info(StickerSwiper.class + ": deleteAllGlobalCommands deleted the following commands: " + entry.getKey());
         }
     }
 }

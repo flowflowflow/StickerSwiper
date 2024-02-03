@@ -10,7 +10,6 @@ import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
 import discord4j.core.object.presence.Status;
-import discord4j.discordjson.json.ApplicationCommandData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
@@ -19,7 +18,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -34,9 +32,10 @@ public class StickerSwiper
 
         CommandManager cmdManager = new CommandManager();
 
-        // Build Swipe command request to be used for command registration
-        ApplicationCommandRequest stickerImageCommandRequest = cmdManager.getGetStickerImageCommandRequest();
-        ApplicationCommandRequest addStickerToServerCommandRequest = cmdManager.getAddStickerToServerCommandRequest();
+        //Build command requests and put them in the list for registration after the bot starts
+        List<ApplicationCommandRequest> commandRequests = new ArrayList<>();
+        commandRequests.add(cmdManager.getGetStickerImageCommandRequest());
+        commandRequests.add(cmdManager.getAddStickerToServerCommandRequest());
 
         // Create GDClient and connect it to Discord
         final DiscordClient client = DiscordClient.create(discordApiToken);
@@ -47,19 +46,7 @@ public class StickerSwiper
                 .login().block();
 
         // Delete any existing commands
-        cmdManager.deleteGuildCommands(applicationId, guildId, gateway);
-
-        // GUILD command registration for swipe command
-        gateway.getRestClient().getApplicationService()
-                .createGuildApplicationCommand(applicationId, guildId, stickerImageCommandRequest)
-                .subscribe();
-
-        gateway.getRestClient().getApplicationService()
-                .createGuildApplicationCommand(applicationId, guildId, addStickerToServerCommandRequest)
-                .subscribe();
-
-
-
+        cmdManager.deleteGuildCommands(gateway);
 
         // Event handling
         gateway.on(MessageInteractionEvent.class, MessageInteractionEventListener::handle).subscribe();
@@ -71,26 +58,6 @@ public class StickerSwiper
 
     }
 
-    //Probably best solution...
-    private static void deleteGuildCommands(long applicationId, long guildId, GatewayDiscordClient gateway) {
-        Map<String, ApplicationCommandData> discordCommands = gateway.getRestClient()
-                .getApplicationService()
-                .getGuildApplicationCommands(applicationId, guildId)
-                .collectMap(ApplicationCommandData::name)
-                .block();
-
-        //Clean out map
-        //discordCommands.entrySet().removeIf(entry -> !entry.getValue().equals(swiperBotCommands));
-
-        for(Map.Entry<String, ApplicationCommandData> entry : discordCommands.entrySet()) {
-            long commandId = entry.getValue().id().asLong();
-            gateway.getRestClient()
-                    .getApplicationService()
-                    .deleteGuildApplicationCommand(applicationId, guildId, commandId);
-
-            log.info(StickerSwiper.class.getSimpleName() + ": deleteAllGuildCommands deleted the following commands: " + entry.getKey());
-        }
-    }
     private static IntentSet getIntents() {
         return IntentSet.of(
                 Intent.GUILD_MESSAGES,
