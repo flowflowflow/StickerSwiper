@@ -5,7 +5,6 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.discordjson.json.ApplicationCommandData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +30,7 @@ public class CommandManager {
         swiperBotCommands = new ArrayList<>(Arrays.asList(getStickerImgCmdName, addStickerCmdName));
     }
 
-    public void registerGuildCommand(GatewayDiscordClient gateway, List<ApplicationCommandRequest> commandRequests) {
+    public void registerGuildCommands(GatewayDiscordClient gateway, List<ApplicationCommandRequest> commandRequests) {
         for(ApplicationCommandRequest request : commandRequests) {
             gateway.getRestClient()
                     .getApplicationService()
@@ -42,7 +41,7 @@ public class CommandManager {
         }
     }
 
-    public void registerGlobalCommand(GatewayDiscordClient gateway, List<ApplicationCommandRequest> commandRequests) {
+    public void registerGlobalCommands(GatewayDiscordClient gateway, List<ApplicationCommandRequest> commandRequests) {
         for(ApplicationCommandRequest request : commandRequests) {
             gateway.getRestClient()
                     .getApplicationService()

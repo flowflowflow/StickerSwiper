@@ -48,6 +48,9 @@ public class StickerSwiper
         // Delete any existing commands
         cmdManager.deleteGuildCommands(gateway);
 
+        //Register guild commands from this bot
+        cmdManager.registerGuildCommands(gateway, commandRequests);
+
         // Event handling
         gateway.on(MessageInteractionEvent.class, MessageInteractionEventListener::handle).subscribe();
 
