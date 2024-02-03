@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 public class AddStickerToServerCommand implements MessageInteractionCommand {
     @Override
     public String getName() {
-        return "Add sticker to this server";
+        return "Add sticker to server";
     }
 
     @Override
