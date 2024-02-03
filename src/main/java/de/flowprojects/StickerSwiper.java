@@ -41,11 +41,11 @@ public class StickerSwiper
 
         CommandManager cmdManager = new CommandManager();
 
-        //Build Swipe command request to be used for command registration
+        // Build Swipe command request to be used for command registration
         ApplicationCommandRequest stickerImageCommandRequest = cmdManager.getGetStickerImageCommandRequest();
         ApplicationCommandRequest addStickerToServerCommandRequest = cmdManager.getAddStickerToServerCommandRequest();
 
-        //Create GDClient and connect it to Discord
+        // Create GDClient and connect it to Discord
         final DiscordClient client = DiscordClient.create(discordApiToken);
         GatewayDiscordClient gateway = client.gateway()
                 .setEnabledIntents(IntentSet.nonPrivileged()
@@ -53,8 +53,10 @@ public class StickerSwiper
                 .setInitialPresence(shard -> ClientPresence.of(Status.ONLINE, ClientActivity.playing("Swiping Stickers >:3c")))
                 .login().block();
 
-        //GUILD command registration for swipe command
+        // Delete any existing commands
+        cmdManager.deleteGuildCommands(applicationId, guildId, gateway);
 
+        // GUILD command registration for swipe command
         gateway.getRestClient().getApplicationService()
                 .createGuildApplicationCommand(applicationId, guildId, stickerImageCommandRequest)
                 .subscribe();
@@ -66,20 +68,8 @@ public class StickerSwiper
 
 
 
-        //Handle various events
+        // Event handling
         gateway.on(MessageInteractionEvent.class, MessageInteractionEventListener::handle).subscribe();
-
-        //Testing
-        gateway.on(MessageCreateEvent.class, event -> {
-            if(event.getMessage().getContent().equals("deleteguildcommands")) {
-                deleteGuildCommands(applicationId, guildId, gateway);
-            }
-            if(event.getMessage().getContent().equals("deleteglobalcommands")) {
-                deleteGlobalCommands(applicationId, gateway);
-            }
-
-            return Mono.empty();
-        }).subscribe();
 
         gateway.on(ReadyEvent.class, event -> {
             log.info("Logged in with {}", gateway.getSelf().block().getUsername());
@@ -108,27 +98,6 @@ public class StickerSwiper
             log.info(StickerSwiper.class.getSimpleName() + ": deleteAllGuildCommands deleted the following commands: " + entry.getKey());
         }
     }
-
-    private static void deleteGlobalCommands(long applicationId, GatewayDiscordClient gateway) {
-        Map<String, ApplicationCommandData> discordCommands = gateway.getRestClient()
-                .getApplicationService()
-                .getGlobalApplicationCommands(applicationId)
-                .collectMap(ApplicationCommandData::name)
-                .block();
-
-        discordCommands.entrySet().removeIf(entry -> !entry.getValue().equals(swiperBotCommands));
-
-        for(Map.Entry<String, ApplicationCommandData> entry : discordCommands.entrySet()) {
-            long commandId = entry.getValue().id().asLong();
-            gateway.getRestClient()
-                    .getApplicationService()
-                    .deleteGlobalApplicationCommand(applicationId, commandId);
-
-            log.info(StickerSwiper.class + "deleteAllGlobalCommands deleted the following commands: " + entry.getKey());
-        }
-    }
-
-
     private static IntentSet getIntents() {
         return IntentSet.of(
                 Intent.GUILD_MESSAGES,
