@@ -1,7 +1,7 @@
 package de.flowprojects.listeners;
 
 import de.flowprojects.commands.AddStickerToServerCommand;
-import de.flowprojects.commands.MessageInteractionCommand;
+import de.flowprojects.commands.IMessageInteractionCommand;
 import de.flowprojects.commands.GetStickerImageCommand;
 import discord4j.core.event.domain.interaction.MessageInteractionEvent;
 import reactor.core.publisher.Flux;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageInteractionEventListener {
-    private final static List<MessageInteractionCommand> commands = new ArrayList<>();
+    private final static List<IMessageInteractionCommand> commands = new ArrayList<>();
 
     static {
         commands.add(new GetStickerImageCommand());

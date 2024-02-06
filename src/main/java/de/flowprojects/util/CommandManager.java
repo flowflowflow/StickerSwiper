@@ -73,14 +73,12 @@ public class CommandManager {
                 .collectMap(ApplicationCommandData::name)
                 .block();
 
-        //Clean out map
-        //discordCommands.entrySet().removeIf(entry -> !entry.getValue().equals(swiperBotCommands));
-
         for(Map.Entry<String, ApplicationCommandData> entry : discordCommands.entrySet()) {
             long commandId = entry.getValue().id().asLong();
             gateway.getRestClient()
                     .getApplicationService()
-                    .deleteGuildApplicationCommand(appId, guildId, commandId);
+                    .deleteGuildApplicationCommand(appId, guildId, commandId)
+                    .block();
 
             log.info(StickerSwiper.class.getSimpleName() + ": deleteAllGuildCommands deleted the following commands: " + entry.getKey());
         }
@@ -92,9 +90,6 @@ public class CommandManager {
                 .getGlobalApplicationCommands(appId)
                 .collectMap(ApplicationCommandData::name)
                 .block();
-
-        //Clean out map
-        //discordCommands.entrySet().removeIf(entry -> !entry.getValue().equals(swiperBotCommands));
 
         for(Map.Entry<String, ApplicationCommandData> entry : discordCommands.entrySet()) {
             long commandId = entry.getValue().id().asLong();
