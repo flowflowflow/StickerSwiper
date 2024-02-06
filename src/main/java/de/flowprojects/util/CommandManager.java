@@ -27,9 +27,15 @@ public class CommandManager {
         getStickerImgCmdName = "Get Sticker Image";
         addStickerCmdName = "Add Sticker to Server";
 
-        swiperBotCommands = new ArrayList<>(Arrays.asList(getStickerImgCmdName, addStickerCmdName));
+        swiperBotCommands = new ArrayList<>();
+
+        swiperBotCommands.add(getStickerImgCmdName);
+        //swiperBotCommands.add(addStickerCmdName);
     }
 
+    // ===============================
+    // Command registration
+    // ===============================
     public void registerGuildCommands(GatewayDiscordClient gateway, List<ApplicationCommandRequest> commandRequests) {
         for(ApplicationCommandRequest request : commandRequests) {
             gateway.getRestClient()
@@ -52,20 +58,9 @@ public class CommandManager {
         }
     }
 
-    public ApplicationCommandRequest getAddStickerToServerCommandRequest() {
-        return ApplicationCommandRequest.builder()
-                .name(addStickerCmdName)
-                .type(3)
-                .build();
-    }
-
-    public ApplicationCommandRequest getGetStickerImageCommandRequest() {
-        return ApplicationCommandRequest.builder()
-                .name(getStickerImgCmdName)
-                .type(3)
-                .build();
-    }
-
+    // ===============================
+    // Command deletion
+    // ===============================
     public void deleteGuildCommands(GatewayDiscordClient gateway) {
         Map<String, ApplicationCommandData> discordCommands = gateway.getRestClient()
                 .getApplicationService()
@@ -99,5 +94,22 @@ public class CommandManager {
 
             log.info(StickerSwiper.class + ": deleteAllGlobalCommands deleted the following commands: " + entry.getKey());
         }
+    }
+
+    // ===============================
+    // Command building
+    // ===============================
+    public ApplicationCommandRequest getAddStickerToServerCommandRequest() {
+        return ApplicationCommandRequest.builder()
+                .name(addStickerCmdName)
+                .type(3)
+                .build();
+    }
+
+    public ApplicationCommandRequest getGetStickerImageCommandRequest() {
+        return ApplicationCommandRequest.builder()
+                .name(getStickerImgCmdName)
+                .type(3)
+                .build();
     }
 }
