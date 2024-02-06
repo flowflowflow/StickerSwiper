@@ -12,6 +12,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>14</maven.compiler.release>
   </properties>
 
   <dependencies>
@@ -36,14 +37,6 @@
       <artifactId>logback-classic</artifactId>
       <version>1.4.14</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.26</version>
-      <scope>provided</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
