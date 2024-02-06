@@ -35,7 +35,7 @@ public class StickerSwiper
         //Build command requests and put them in the list for registration after the bot starts
         List<ApplicationCommandRequest> commandRequests = new ArrayList<>();
         commandRequests.add(cmdManager.getGetStickerImageCommandRequest());
-        commandRequests.add(cmdManager.getAddStickerToServerCommandRequest());
+        //commandRequests.add(cmdManager.getAddStickerToServerCommandRequest());
 
         // Create GDClient and connect it to Discord
         final DiscordClient client = DiscordClient.create(discordApiToken);
